@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+    <header>
+        <resultCode>0</resultCode>
+        <resultMsg>NORMAL_SERVICE</resultMsg>
+    </header>
+    <body>
+        <dataType>XML</dataType>
+        <items>
+            <item>
+                <baseDate>20210628</baseDate>
+                <baseTime>0600</baseTime>
+                <category>RN1</category>
+                <nx>55</nx>
+                <ny>127</ny>
+                <obsrValue>1.1</obsrValue>
+            </item>
+        </items>
+        <numOfRows>10</numOfRows>
+        <pageNo>1</pageNo>
+        <totalCount>8</totalCount>
+    </body>
+</response>
