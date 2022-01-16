@@ -10,7 +10,7 @@ function weather() {
             let dataHeader = data.result.response.header.resultCode;
 
             if (dataHeader == "00") {
-                console.log("succes ==> ");
+                console.log("success ==> ");
                 console.log(data);
             } else {
                 console.log("fail ==> ");
