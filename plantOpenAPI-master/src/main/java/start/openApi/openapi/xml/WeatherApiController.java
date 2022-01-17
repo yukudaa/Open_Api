@@ -46,7 +46,7 @@ public class WeatherApiController {
                 "&dataType=JSON" +
                 "&numOfRows=10" +
                 "&pageNo=1" +
-                "&base_date=20220116"+
+                "&base_date=20220117"+
                 "&base_time=0600"+
                 "&nx=55" +
                 "&ny=127";
@@ -147,6 +147,7 @@ public class WeatherApiController {
 
             for (int i = 0; i < item.length(); i++) {
                 JSONObject obj = item.getJSONObject(i);
+                int id = i;
                 String baseDate = obj.getString("baseDate");
                 String baseTime = obj.getString("baseTime");
                 String category = obj.getString("category");
@@ -155,8 +156,24 @@ public class WeatherApiController {
                 String obsrValue = obj.getString("obsrValue");
 
                 if(category.equals("T1H") || category.equals("RN1") ||category.equals("REH") ||category.equals("PTY")) {
-                    DB db = new DB(baseDate,baseTime,category,nx,ny,obsrValue);
+//                    DB db = new DB(id,baseDate,baseTime,category,nx,ny,obsrValue);
+                    DB db =
+                        DB.builder()
+                            .id(i)
+                            .baseDate(baseDate)
+                            .baseTime(baseTime)
+                            .category(category)
+                            .nx(nx)
+                            .ny(ny)
+                            .obsrValue(obsrValue)
+                            .build();
+
+//                    // create
+//                    DB newDB = DbRepository.save(db);
+//                    log.info(newDB.toString());
+
                     dbItems.add(db);
+
 
                     System.out.println("category("+i+"): " + category);
                     System.out.println();
