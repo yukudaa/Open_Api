@@ -1,27 +1,36 @@
+
 package start.openApi.openapi.xml;
 
-import lombok.Data;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
-@Data
+@Table(name = "weatherDB")
+@ToString
+@Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class DB {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     private String baseDate;
     private String baseTime;
-    @Id
     private String category;
     private int nx;
     private int ny;
     private String obsrValue;
 
-    public DB(String baseDate, String baseTime, String category, int nx, int ny, String obsrValue) {
-        this.baseDate = baseDate;
-        this.baseTime = baseTime;
-        this.category = category;
-        this.nx = nx;
-        this.ny = ny;
-        this.obsrValue = obsrValue;
-    }
+//    public DB(int id,String baseDate, String baseTime, String category, int nx, int ny, String obsrValue) {
+//        this.id = id;
+//        this.baseDate = baseDate;
+//        this.baseTime = baseTime;
+//        this.category = category;
+//        this.nx = nx;
+//        this.ny = ny;
+//        this.obsrValue = obsrValue;
+//    }
 }
