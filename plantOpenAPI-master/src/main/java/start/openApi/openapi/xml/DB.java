@@ -9,14 +9,15 @@ import javax.persistence.*;
 @Table(name = "weatherDB")
 @ToString
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class DB {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @GeneratedValue
+    private Long id;
     private String baseDate;
     private String baseTime;
     private String category;
@@ -33,4 +34,5 @@ public class DB {
 //        this.ny = ny;
 //        this.obsrValue = obsrValue;
 //    }
+
 }
