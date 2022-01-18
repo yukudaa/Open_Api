@@ -3,12 +3,19 @@ package start.openApi.openapi.xml;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.var;
 //import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -29,7 +36,10 @@ import java.util.List;
     // @ResponseBody 어노테이션을 붙여주면 된다.
     // @ResponseBody를 사용한 경우 View가 아닌 자바 객체를 리턴해주면 된다.
 @RequestMapping("/api")     // 클라이언트는 URL로 요청을 전송하고, 요청 URL을 어떤 메서드가 처리할지 여부를 결정하는 것
+@Transactional(readOnly = true)
 public class WeatherApiController {
+
+    @Autowired DbRepository dbRepository;
 
     @GetMapping("/weather")
     public String restApiGetWeather() throws Exception {
@@ -46,18 +56,18 @@ public class WeatherApiController {
                 "&dataType=JSON" +
                 "&numOfRows=10" +
                 "&pageNo=1" +
-                "&base_date=20220117"+
+                "&base_date=20220118"+
                 "&base_time=0600"+
                 "&nx=55" +
                 "&ny=127";
+
+
 
         HashMap<String, Object> resultMap = getDataFromJson(url, "UTF-8", "get", "");
         System.out.println("# RESUTL : " + resultMap);
         JSONObject jsonObj = new JSONObject();      // Json 형태로 바꿔주는 메서드
         jsonObj.put("result", resultMap);
 
-        Object result123 = jsonObj.get("result");
-//        System.out.println("result123 = " + result123.getClass());
 
         return jsonObj.toString();
 
@@ -123,31 +133,22 @@ public class WeatherApiController {
 
             String result1 = result.toString();
 
-            JSONObject result2 = new JSONObject(result1);
-//            JSONArray jArray = result2.getJSONArray("items");
-//            for (int i = 0; i < jArray.length(); i++) {
-//                JSONObject obj = jArray.getJSONObject(i);
-//                String category = obj.getString("category");
-//                System.out.println("category("+i+"): " + category);
-//                System.out.println();
-//            }
-            JSONObject response = result2.getJSONObject("response");
-            System.out.println("response = " + response);
-            JSONObject body = response.getJSONObject("body");
-            System.out.println("body = " + body);
+            JSONObject result2 = new JSONObject(result1);    // result값 가져오기
 
-            JSONObject items = body.getJSONObject("items");
-//            System.out.println("items = " + items);
-//
-////            JSONObject item = items.getJSONObject("item");
-            JSONArray item = items.getJSONArray("item");
-//            System.out.println("item = " + item);
+            JSONObject response = result2.getJSONObject("response");    // response값 가져오기
+
+            JSONObject body = response.getJSONObject("body");           // body값 가져오기
+
+            JSONObject items = body.getJSONObject("items");             // items값 가져오기
+
+            JSONArray item = items.getJSONArray("item");            // item이 배열로 들어있어서 Array로 가져오기
 
             List<DB> dbItems = new ArrayList<>();
 
-            for (int i = 0; i < item.length(); i++) {
-                JSONObject obj = item.getJSONObject(i);
-                int id = i;
+
+            for (Long i = 1L; i <= item.length(); i++) {
+                JSONObject obj = item.getJSONObject(Math.toIntExact(i));
+                Long id = i;
                 String baseDate = obj.getString("baseDate");
                 String baseTime = obj.getString("baseTime");
                 String category = obj.getString("category");
@@ -155,37 +156,40 @@ public class WeatherApiController {
                 int ny = obj.getInt("ny");
                 String obsrValue = obj.getString("obsrValue");
 
-                if(category.equals("T1H") || category.equals("RN1") ||category.equals("REH") ||category.equals("PTY")) {
-//                    DB db = new DB(id,baseDate,baseTime,category,nx,ny,obsrValue);
-                    DB db =
-                        DB.builder()
-                            .id(i)
-                            .baseDate(baseDate)
-                            .baseTime(baseTime)
-                            .category(category)
-                            .nx(nx)
-                            .ny(ny)
-                            .obsrValue(obsrValue)
-                            .build();
+                if(category.equals("T1H") || category.equals("RN1") || category.equals("REH") || category.equals("PTY")) {
 
-//                    // create
-//                    DB newDB = DbRepository.save(db);
-//                    log.info(newDB.toString());
-
+                    DB db = new DB(id,baseDate,baseTime,category,nx,ny,obsrValue);
                     dbItems.add(db);
 
+//                    db.setId(id);
+//                    db.setBaseDate(baseDate);
+//                    db.setBaseTime(baseTime);
+//                    db.setCategory(category);
+//                    db.setNx(nx);
+//                    db.setNy(ny);
+//                    db.setObsrValue(obsrValue);
+//
+//                    Long saveId = dbRepository.save(db);
+//                    DB findDB = dbRepository.find(Math.toIntExact(saveId));
 
+
+                    System.out.println("id("+i+"): " + id);
+                    System.out.println("baseDate("+i+"): " + baseDate);
+                    System.out.println("baseTime("+i+"): " + baseTime);
                     System.out.println("category("+i+"): " + category);
+                    System.out.println("nx("+i+"): " + nx);
+                    System.out.println("ny("+i+"): " + ny);
+                    System.out.println("obsrValue("+i+"): " +obsrValue);
                     System.out.println();
                 }
 
             }
-            for (DB dbItem : dbItems) {
-                String BaseDate = dbItem.getBaseDate();
-                System.out.println("BaseDate = " + BaseDate);
-                String category = dbItem.getCategory();
-                System.out.println("category = " + category);
-            }
+//            for (DB dbItem : dbItems) {
+//                String BaseDate = dbItem.getBaseDate();
+//                System.out.println("BaseDate = " + BaseDate);
+//                String category = dbItem.getCategory();
+//                System.out.println("category = " + category);
+//            }
 
         } catch (Exception e) {
             e.printStackTrace();
