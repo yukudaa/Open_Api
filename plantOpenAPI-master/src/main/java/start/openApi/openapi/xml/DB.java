@@ -16,8 +16,7 @@ import javax.persistence.*;
 public class DB {
 
     @Id
-    @GeneratedValue
-    private Long id;
+    private int id;
     private String baseDate;
     private String baseTime;
     private String category;
