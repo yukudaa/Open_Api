@@ -1,6 +1,7 @@
 package start.openApi.openapi.xml;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.var;
 //import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,8 @@ import java.util.List;
     // @ResponseBody 어노테이션을 붙여주면 된다.
     // @ResponseBody를 사용한 경우 View가 아닌 자바 객체를 리턴해주면 된다.
 @RequestMapping("/api")     // 클라이언트는 URL로 요청을 전송하고, 요청 URL을 어떤 메서드가 처리할지 여부를 결정하는 것
-@Transactional(readOnly = true)
+@Transactional
+@RequiredArgsConstructor
 public class WeatherApiController {
 
     @Autowired DbRepository dbRepository;
@@ -60,7 +62,6 @@ public class WeatherApiController {
                 "&base_time=0600"+
                 "&nx=55" +
                 "&ny=127";
-
 
 
         HashMap<String, Object> resultMap = getDataFromJson(url, "UTF-8", "get", "");
@@ -145,10 +146,9 @@ public class WeatherApiController {
 
             List<DB> dbItems = new ArrayList<>();
 
-
-            for (Long i = 1L; i <= item.length(); i++) {
-                JSONObject obj = item.getJSONObject(Math.toIntExact(i));
-                Long id = i;
+            for (int i = 0; i < item.length(); i++) {
+                JSONObject obj = item.getJSONObject(i);
+                int id = i+1;
                 String baseDate = obj.getString("baseDate");
                 String baseTime = obj.getString("baseTime");
                 String category = obj.getString("category");
@@ -159,19 +159,8 @@ public class WeatherApiController {
                 if(category.equals("T1H") || category.equals("RN1") || category.equals("REH") || category.equals("PTY")) {
 
                     DB db = new DB(id,baseDate,baseTime,category,nx,ny,obsrValue);
-                    dbItems.add(db);
 
-//                    db.setId(id);
-//                    db.setBaseDate(baseDate);
-//                    db.setBaseTime(baseTime);
-//                    db.setCategory(category);
-//                    db.setNx(nx);
-//                    db.setNy(ny);
-//                    db.setObsrValue(obsrValue);
-//
-//                    Long saveId = dbRepository.save(db);
-//                    DB findDB = dbRepository.find(Math.toIntExact(saveId));
-
+                    dbRepository.save(db);
 
                     System.out.println("id("+i+"): " + id);
                     System.out.println("baseDate("+i+"): " + baseDate);
@@ -184,12 +173,6 @@ public class WeatherApiController {
                 }
 
             }
-//            for (DB dbItem : dbItems) {
-//                String BaseDate = dbItem.getBaseDate();
-//                System.out.println("BaseDate = " + BaseDate);
-//                String category = dbItem.getCategory();
-//                System.out.println("category = " + category);
-//            }
 
         } catch (Exception e) {
             e.printStackTrace();
